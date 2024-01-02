@@ -1,0 +1,12 @@
+body {
+	margin: 0;
+}
+
+ul {
+	list-style: none;
+	padding: 0;
+}
+
+.animated {
+	transition: all 300ms ease-in-out;
+}
