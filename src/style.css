@@ -10,3 +10,23 @@ ul {
 .animated {
 	transition: all 300ms ease-in-out;
 }
+
+.flex {
+	display: flex;
+}
+
+.flex-col {
+	flex-direction: column;
+}
+
+.flex-items-center {
+	align-items: center;
+}
+
+.gap-s {
+	gap: 1rem;
+}
+
+.gap-m {
+	gap: 2rem;
+}

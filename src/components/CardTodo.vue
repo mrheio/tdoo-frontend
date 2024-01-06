@@ -49,10 +49,8 @@ const cardClasses = computed(() =>
 	<Card :class="cardClasses" @click="updateTodo">
 		<template #content>
 			<div class="card__content">
-				<div style="display: flex; align-items: center; gap: 1rem">
-					<div
-						style="display: flex; align-items: center; width: 16px"
-					>
+				<div class="flex flex-items-center gap-s">
+					<div class="flex flex-items-center" style="width: 16px">
 						<ProgressSpinner
 							v-if="loading"
 							style="width: 16px; height: 16px"
@@ -77,7 +75,6 @@ const cardClasses = computed(() =>
 						aria-haspopup="true"
 						aria-controls="overlay_menu"
 					/>
-
 					<Menu
 						ref="menu"
 						id="overlay_menu"

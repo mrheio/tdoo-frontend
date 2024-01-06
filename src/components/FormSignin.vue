@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
 import { Form } from 'vee-validate';
 import { ref } from 'vue';
 import { useSession } from '../stores/session.store';
+import Input from './Input.vue';
 
 const props = defineProps(['onSuccess']);
 const storeSession = useSession();
 const fields = ref({ username: '', password: '' });
-const fieldErrors = ref({ username: null, password: null });
+const fieldErrors = ref({ username: undefined, password: undefined });
 
 const signIn = async () => {
 	await storeSession.signin(fields.value);
@@ -20,46 +20,34 @@ const signIn = async () => {
 	if (storeSession.error && storeSession.error.details.fieldErrors) {
 		fieldErrors.value = {
 			username:
-				storeSession.error.details.fieldErrors?.username?.[0] ?? null,
+				storeSession.error.details.fieldErrors?.username?.[0] ??
+				undefined,
 			password:
-				storeSession.error.details.fieldErrors?.password?.[0] ?? null,
+				storeSession.error.details.fieldErrors?.password?.[0] ??
+				undefined,
 		};
 	}
 };
 </script>
 
 <template>
-	<form
-		style="display: flex; flex-direction: column; gap: 2rem"
-		@submit.prevent="signIn"
-	>
-		<div style="display: flex; flex-direction: column; gap: 1rem">
-			<label for="username">Username</label>
-			<InputText
-				name="username"
-				id="username"
-				v-model="fields.username"
-				:class="{ 'p-invalid': fieldErrors.username }"
-			/>
-			<small class="p-error" v-if="fieldErrors.username">{{
-				fieldErrors.username
-			}}</small>
-		</div>
-
-		<div style="display: flex; flex-direction: column; gap: 1rem">
-			<label for="password">Password</label>
-			<InputText
-				name="password"
-				id="password"
-				type="password"
-				v-model="fields.password"
-				:class="{ 'p-invalid': fieldErrors.password }"
-			/>
-			<small class="p-error" v-if="fieldErrors.password">{{
-				fieldErrors.password
-			}}</small>
-		</div>
-
+	<form class="flex flex-col gap-m" @submit.prevent="signIn">
+		<Input
+			name="username"
+			id="username"
+			label="Username"
+			type="text"
+			v-model="fields.username"
+			:error="fieldErrors.username"
+		/>
+		<Input
+			name="password"
+			id="password"
+			label="Password"
+			type="password"
+			:v-model="fields.password"
+			:error="fieldErrors.password"
+		/>
 		<Button
 			type="submit"
 			label="Sign In"
