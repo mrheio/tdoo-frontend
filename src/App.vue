@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import ProgressSpinner from 'primevue/progressspinner';
 import Bootstrap from './Bootstrap.vue';
+import Loading from './components/Loading.vue';
 </script>
 
 <template>
@@ -10,15 +10,9 @@ import Bootstrap from './Bootstrap.vue';
 		</template>
 
 		<template #fallback>
-			<div class="loading"><ProgressSpinner /></div>
+			<Loading screen />
 		</template>
 	</Suspense>
 </template>
 
-<style>
-.loading {
-	min-height: 100vh;
-	display: grid;
-	place-items: center;
-}
-</style>
+<style></style>

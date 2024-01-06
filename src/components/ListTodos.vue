@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import ProgressSpinner from 'primevue/progressspinner';
 import { computed, watchEffect } from 'vue';
 import { useSession } from '../stores/session.store';
 import { useTodos } from '../stores/todos.store';
 import CardTodo from './CardTodo.vue';
+import Loading from './Loading.vue';
 
 const storeSession = useSession();
 const storeTodos = useTodos();
@@ -17,9 +17,7 @@ watchEffect(async () => {
 </script>
 
 <template>
-	<div v-if="shouldShowLoading" class="loading">
-		<ProgressSpinner />
-	</div>
+	<Loading v-if="shouldShowLoading" screen />
 
 	<ul v-else class="list">
 		<li v-for="todo in storeTodos.todos">
