@@ -4,34 +4,38 @@ import Card from 'primevue/card';
 import Menu from 'primevue/menu';
 import ProgressSpinner from 'primevue/progressspinner';
 import { computed, ref } from 'vue';
+import TodosService from '../api/todos.api';
+import { useMyToast } from '../stores/toast.store';
 import { useTodos } from '../stores/todos.store';
 import { Todo } from '../utils/types';
 
 const props = defineProps<{ todo: Todo }>();
-const storeTodos = useTodos();
-const isLoading = ref(false);
-const menu = ref();
 
-const toggleMenu = (event) => {
+const toast = useMyToast();
+const storeTodos = useTodos();
+const menu = ref();
+const loading = ref(false);
+
+const toggleMenu = (event: MouseEvent) => {
 	menu.value.toggle(event);
 };
 
 const updateTodo = async () => {
-	isLoading.value = true;
-
-	await storeTodos.updateTodo(props.todo.id, {
+	loading.value = true;
+	await TodosService.update(props.todo.id, {
 		completed: !props.todo.completed,
 	});
-
-	isLoading.value = false;
+	loading.value = false;
+	toast.success('Todo updated');
+	await storeTodos.fetchCurrentSessionTodos();
 };
 
 const deleteTodo = async () => {
-	isLoading.value = true;
-
-	await storeTodos.deleteTodo(props.todo.id);
-
-	isLoading.value = false;
+	loading.value = true;
+	await TodosService.delete(props.todo.id);
+	loading.value = false;
+	toast.success('Todo deleted');
+	await storeTodos.fetchCurrentSessionTodos();
 };
 
 const cardClasses = computed(() =>
@@ -49,27 +53,18 @@ const cardClasses = computed(() =>
 					<div
 						style="display: flex; align-items: center; width: 16px"
 					>
-						<i
-							v-if="!isLoading && props.todo.completed"
-							class="pi pi-check-square"
-						></i>
 						<ProgressSpinner
-							v-if="isLoading"
+							v-if="loading"
 							style="width: 16px; height: 16px"
 							strokeWidth="8"
 						/>
+						<i
+							v-else-if="props.todo.completed"
+							class="pi pi-check-square"
+						></i>
 					</div>
 
 					<div>{{ props.todo.task }}</div>
-				</div>
-
-				<div>
-					{{
-						new Date(props.todo.created_at).toLocaleDateString(
-							'en-GB',
-							{ day: 'numeric', month: 'short', year: 'numeric' },
-						)
-					}}
 				</div>
 
 				<div>
@@ -103,11 +98,11 @@ const cardClasses = computed(() =>
 
 <style scoped>
 .card {
-	background-color: var(--highlight-bg);
 }
 
 .card--completed {
-	background-color: var(--primary-color);
+	background-color: var(--highlight-bg);
+	color: var(--highlight-text-color);
 }
 
 .card--interactable {

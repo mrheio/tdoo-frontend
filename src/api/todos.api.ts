@@ -26,6 +26,8 @@ const getTodos = errorHandler(async (filters?: { user_id?: string }) => {
 		.get('todos', {
 			searchParams: {
 				...(filters?.user_id && { user_id: filters?.user_id }),
+				order_by: 'completed',
+				order_dir: 'asc',
 			},
 		})
 		.json();
