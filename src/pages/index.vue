@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import TodosService from '../api/todos.api';
 import ListTodos from '../components/ListTodos.vue';
 import { useSession } from '../stores/session.store';
@@ -14,19 +14,18 @@ const storeTodos = useTodos();
 const fields = ref({ task: '' });
 const fieldErrors = ref({ task: null });
 const loading = ref(false);
-const success = ref(false);
 
 const createTodo = async () => {
 	try {
 		loading.value = true;
-		success.value = false;
 		await TodosService.create({
 			...fields.value,
 			user_id: storeSession.session!.id,
 		});
-		success.value = true;
 		fields.value = { task: '' };
 		fieldErrors.value = { task: null };
+		toast.success('Todo created');
+		await storeTodos.fetchCurrentSessionTodos();
 	} catch (e) {
 		if (e?.details?.fieldErrors) {
 			fieldErrors.value = {
@@ -39,13 +38,6 @@ const createTodo = async () => {
 		loading.value = false;
 	}
 };
-
-watch(success, async (val) => {
-	if (val) {
-		toast.success('Todo created');
-		await storeTodos.fetchCurrentSessionTodos();
-	}
-});
 </script>
 
 <template>
@@ -58,11 +50,9 @@ watch(success, async (val) => {
 		</div>
 
 		<template v-else>
-			<div
-				style="margin: 1rem 2rem; display: flex; flex-direction: column"
-			>
+			<div class="flex flex-col" style="margin: 1rem 2rem">
 				<div>
-					<div style="display: flex; gap: 1rem">
+					<div class="flex gap-s">
 						<InputText
 							placeholder="What do you have in mind?"
 							style="width: 100%"
