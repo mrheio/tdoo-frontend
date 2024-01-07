@@ -5,32 +5,30 @@ import { ref } from 'vue';
 import { useSession } from '../stores/session.store';
 import Input from './Input.vue';
 
+const init = {
+	fields: { email: '', username: '', password: '' },
+	fieldErrors: { email: undefined, username: undefined, password: undefined },
+};
+
 const props = defineProps(['onSuccess']);
 const storeSession = useSession();
-const fields = ref({ email: '', username: '', password: '' });
-const fieldErrors = ref({
-	email: undefined,
-	username: undefined,
-	password: undefined,
-});
+const fields = ref(init.fields);
+const fieldErrors = ref(init.fieldErrors);
 
 const register = async () => {
+	fieldErrors.value = init.fieldErrors;
+
 	await storeSession.register(fields.value);
 
 	if (storeSession.success === 'register') {
 		props.onSuccess();
 	}
 
-	if (storeSession.error && storeSession.error.details.fieldErrors) {
+	if (storeSession.error?.details?.fieldErrors) {
 		fieldErrors.value = {
-			email:
-				storeSession.error.details.fieldErrors?.email?.[0] ?? undefined,
-			username:
-				storeSession.error.details.fieldErrors?.username?.[0] ??
-				undefined,
-			password:
-				storeSession.error.details.fieldErrors?.password?.[0] ??
-				undefined,
+			email: storeSession.error.details.fieldErrors?.email?.[0],
+			username: storeSession.error.details.fieldErrors?.username?.[0],
+			password: storeSession.error.details.fieldErrors?.password?.[0],
 		};
 	}
 };
@@ -59,7 +57,7 @@ const register = async () => {
 			id="password"
 			label="Password"
 			type="password"
-			:v-model="fields.password"
+			v-model="fields.password"
 			:error="fieldErrors.password"
 		/>
 		<Button

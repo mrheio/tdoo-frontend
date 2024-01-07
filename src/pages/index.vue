@@ -8,29 +8,32 @@ import { useSession } from '../stores/session.store';
 import { useMyToast } from '../stores/toast.store';
 import { useTodos } from '../stores/todos.store';
 
+const init = { fields: { task: '' }, fieldErrors: { task: undefined } };
+
 const storeSession = useSession();
 const toast = useMyToast();
 const storeTodos = useTodos();
-const fields = ref({ task: '' });
-const fieldErrors = ref({ task: null });
+
+const fields = ref(init.fields);
+const fieldErrors = ref(init.fieldErrors);
 const loading = ref(false);
 
 const createTodo = async () => {
 	try {
 		loading.value = true;
+		fieldErrors.value = init.fieldErrors;
+
 		await TodosService.create({
 			...fields.value,
 			user_id: storeSession.session!.id,
 		});
-		fields.value = { task: '' };
-		fieldErrors.value = { task: null };
+
+		fields.value = init.fields;
 		toast.success('Todo created');
 		await storeTodos.fetchCurrentSessionTodos();
 	} catch (e) {
 		if (e?.details?.fieldErrors) {
-			fieldErrors.value = {
-				task: e.details.fieldErrors?.task?.[0] ?? null,
-			};
+			fieldErrors.value = { task: e.details.fieldErrors?.task?.[0] };
 		} else {
 			toast.error(e.message);
 		}
@@ -78,11 +81,12 @@ const createTodo = async () => {
 	</div>
 </template>
 
-<style>
+<style scoped>
 .container {
 	max-width: 768px;
 	margin-inline: auto;
 }
+
 .blank {
 	height: 50vh;
 	display: grid;

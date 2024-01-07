@@ -5,26 +5,29 @@ import { ref } from 'vue';
 import { useSession } from '../stores/session.store';
 import Input from './Input.vue';
 
+const init = {
+	fields: { username: '', password: '' },
+	fieldErrors: { username: undefined, password: undefined },
+};
+
 const props = defineProps(['onSuccess']);
 const storeSession = useSession();
-const fields = ref({ username: '', password: '' });
-const fieldErrors = ref({ username: undefined, password: undefined });
+const fields = ref(init.fields);
+const fieldErrors = ref(init.fieldErrors);
 
 const signIn = async () => {
+	fieldErrors.value = init.fieldErrors;
+
 	await storeSession.signin(fields.value);
 
 	if (storeSession.success === 'signin') {
 		props.onSuccess();
 	}
 
-	if (storeSession.error && storeSession.error.details.fieldErrors) {
+	if (storeSession.error?.details?.fieldErrors) {
 		fieldErrors.value = {
-			username:
-				storeSession.error.details.fieldErrors?.username?.[0] ??
-				undefined,
-			password:
-				storeSession.error.details.fieldErrors?.password?.[0] ??
-				undefined,
+			username: storeSession.error.details.fieldErrors?.username?.[0],
+			password: storeSession.error.details.fieldErrors?.password?.[0],
 		};
 	}
 };
@@ -45,7 +48,7 @@ const signIn = async () => {
 			id="password"
 			label="Password"
 			type="password"
-			:v-model="fields.password"
+			v-model="fields.password"
 			:error="fieldErrors.password"
 		/>
 		<Button
