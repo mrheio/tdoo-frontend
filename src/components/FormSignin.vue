@@ -2,6 +2,7 @@
 import Button from 'primevue/button';
 import { Form } from 'vee-validate';
 import { ref } from 'vue';
+import { ValidationError } from '../api/ApiError';
 import { useSession } from '../stores/session.store';
 import Input from './Input.vue';
 
@@ -24,7 +25,7 @@ const signIn = async () => {
 		props.onSuccess();
 	}
 
-	if (storeSession.error?.details?.fieldErrors) {
+	if (storeSession.error instanceof ValidationError) {
 		fieldErrors.value = {
 			username: storeSession.error.details.fieldErrors?.username?.[0],
 			password: storeSession.error.details.fieldErrors?.password?.[0],

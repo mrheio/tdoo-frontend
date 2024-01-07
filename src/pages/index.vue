@@ -2,6 +2,7 @@
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import { ref } from 'vue';
+import { ValidationError } from '../api/ApiError';
 import TodosService from '../api/todos.api';
 import ListTodos from '../components/ListTodos.vue';
 import { useSession } from '../stores/session.store';
@@ -32,7 +33,7 @@ const createTodo = async () => {
 		toast.success('Todo created');
 		await storeTodos.fetchCurrentSessionTodos();
 	} catch (e) {
-		if (e?.details?.fieldErrors) {
+		if (e instanceof ValidationError) {
 			fieldErrors.value = { task: e.details.fieldErrors?.task?.[0] };
 		} else {
 			toast.error(e.message);

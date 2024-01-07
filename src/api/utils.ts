@@ -1,9 +1,12 @@
 import { HTTPError } from 'ky';
+import ApiError, { ValidationError } from './ApiError';
 
 const convertError = async (e: unknown) => {
 	if (e instanceof HTTPError) {
 		const data = await e.response.json();
-		return data;
+		return ApiError.isValidationError(data)
+			? new ValidationError(data)
+			: new ApiError(data);
 	}
 	return e;
 };
